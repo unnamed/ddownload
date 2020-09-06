@@ -1,7 +1,9 @@
 package team.unnamed.dependency;
 
 import team.unnamed.dependency.util.Urls;
+import team.unnamed.dependency.util.Validate;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -17,33 +19,39 @@ public class MavenDependency implements Dependency {
 
     private final String artifactName;
 
-    private final String repository;
+    private final String[] repositories;
     private final String groupId;
     private final String artifactId;
     private final String version;
 
-    public MavenDependency(String repository, String groupId, String artifactId,
+    public MavenDependency(String[] repositories, String groupId, String artifactId,
                            String version, String artifactName) {
-        this.artifactName = artifactName;
-        this.repository = repository;
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
+        this.artifactName = Validate.notEmpty(artifactName);
+        this.repositories = Validate.eachNotEmpty(repositories);
+        this.groupId = Validate.notEmpty(groupId);
+        this.artifactId = Validate.notEmpty(artifactId);
+        this.version = Validate.notEmpty(version);
     }
 
-    public MavenDependency(String repository, String groupId, String artifactId, String version) {
-        this(repository, groupId, artifactId, version, artifactId + "-" + version + ".jar");
+    public MavenDependency(String[] repositories, String groupId, String artifactId, String version) {
+        this(repositories, groupId, artifactId, version, artifactId + "-" + version + ".jar");
     }
 
     public MavenDependency(String groupId, String artifactId, String version) {
-        this(CENTRAL, groupId, artifactId, version);
+        this(new String[] {CENTRAL}, groupId, artifactId, version);
     }
 
     @Override
-    public String toUrl() {
-        return Urls.endWithSlash(repository) + Urls.dotsToSlashes(groupId)
-                + "/" + artifactId + "/" + version + "/" + artifactId
-                + "-" + version + ".jar";
+    public String[] getPossibleUrls() {
+        String[] possibleUrls = new String[repositories.length];
+        for (int i = 0; i < possibleUrls.length; i++) {
+            String repository = repositories[i];
+            String url = Urls.endWithSlash(repository) + Urls.dotsToSlashes(groupId)
+                    + "/" + artifactId + "/" + version + "/" + artifactId
+                    + "-" + version + ".jar";
+            possibleUrls[i] = url;
+        }
+        return possibleUrls;
     }
 
     @Override
@@ -60,22 +68,22 @@ public class MavenDependency implements Dependency {
             return false;
         }
         MavenDependency that = (MavenDependency) o;
-        return Objects.equals(artifactName, that.artifactName) &&
-                Objects.equals(repository, that.repository) &&
-                Objects.equals(groupId, that.groupId) &&
-                Objects.equals(artifactId, that.artifactId) &&
-                Objects.equals(version, that.version);
+        return artifactName.equals(that.artifactName) &&
+                Arrays.equals(repositories, that.repositories) &&
+                groupId.equals(that.groupId) &&
+                artifactId.equals(that.artifactId) &&
+                version.equals(that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(artifactName, repository, groupId, artifactId, version);
+        return Objects.hash(artifactName, repositories, groupId, artifactId, version);
     }
 
     @Override
     public String toString() {
         return "Maven Dependency " + groupId + ":" + artifactId
-                + ":" + version + " in " + repository;
+                + ":" + version + " in " + String.join(" or ", repositories);
     }
 
 }

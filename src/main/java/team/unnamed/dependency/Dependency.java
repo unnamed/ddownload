@@ -3,17 +3,17 @@ package team.unnamed.dependency;
 /**
  * Represents an application dependency.
  * This dependency can be formatted to
- * a URL (where the dependency will be
- * downloaded from)
+ * an array of URLs (where the dependency
+ * can be downloaded from)
  */
 public interface Dependency {
 
     /**
-     * @return The url where the
-     * dependency will be downloaded
+     * @return The urls where the
+     * dependency can be downloaded
      * from.
      */
-    String toUrl();
+    String[] getPossibleUrls();
 
     /**
      * @return The already downloaded
