@@ -6,7 +6,7 @@ import java.net.URL;
 
 public interface NIOConnection {
 
-  File download(File file);
+    File download(File file);
 
-  int sizeOf(URL url) throws IOException;
+    int sizeOf(URL url) throws IOException;
 }
