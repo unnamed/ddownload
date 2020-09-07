@@ -18,6 +18,7 @@ public class MavenDependency implements Dependency {
     public static final String CENTRAL = "https://repo1.maven.org/maven2/";
 
     private final String artifactName;
+    private final boolean optional;
 
     private final String[] repositories;
     private final String groupId;
@@ -25,20 +26,26 @@ public class MavenDependency implements Dependency {
     private final String version;
 
     public MavenDependency(String[] repositories, String groupId, String artifactId,
-                           String version, String artifactName) {
+                           String version, String artifactName, boolean optional) {
         this.artifactName = Validate.notEmpty(artifactName);
+        this.optional = optional;
         this.repositories = Validate.eachNotEmpty(repositories);
         this.groupId = Validate.notEmpty(groupId);
         this.artifactId = Validate.notEmpty(artifactId);
         this.version = Validate.notEmpty(version);
     }
 
-    public MavenDependency(String[] repositories, String groupId, String artifactId, String version) {
-        this(repositories, groupId, artifactId, version, artifactId + "-" + version + ".jar");
+    public MavenDependency(String[] repositories, String groupId, String artifactId, String version, boolean optional) {
+        this(repositories, groupId, artifactId, version, artifactId + "-" + version + ".jar", optional);
     }
 
-    public MavenDependency(String groupId, String artifactId, String version) {
-        this(new String[] {CENTRAL}, groupId, artifactId, version);
+    public MavenDependency(String groupId, String artifactId, String version, boolean optional) {
+        this(new String[] {CENTRAL}, groupId, artifactId, version, optional);
+    }
+
+    @Override
+    public boolean isOptional() {
+        return optional;
     }
 
     @Override

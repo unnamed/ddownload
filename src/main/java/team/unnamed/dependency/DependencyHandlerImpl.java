@@ -72,7 +72,7 @@ public class DependencyHandlerImpl implements DependencyHandler {
 
             if (errorDetails.errorCount() == 0) {
                 downloaded.add(file);
-            } else {
+            } else if (!dependency.isOptional()) {
                 throw errorDetails.toDownloadException();
             }
         }

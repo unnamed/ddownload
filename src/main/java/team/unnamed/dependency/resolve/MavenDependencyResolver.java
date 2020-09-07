@@ -38,7 +38,8 @@ public class MavenDependencyResolver implements DependencyResolver<Class<?>> {
                     libraryRepositories.toArray(new String[0]),
                     library.groupId(),
                     library.artifactId(),
-                    library.version()
+                    library.version(),
+                    library.optional()
             );
             dependencies.add(dependency);
         }

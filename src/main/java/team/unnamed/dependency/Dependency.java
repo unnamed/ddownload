@@ -9,6 +9,12 @@ package team.unnamed.dependency;
 public interface Dependency {
 
     /**
+     * @return True if the dependency
+     * is optional.
+     */
+    boolean isOptional();
+
+    /**
      * @return The urls where the
      * dependency can be downloaded
      * from.

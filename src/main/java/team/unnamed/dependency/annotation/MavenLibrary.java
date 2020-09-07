@@ -33,6 +33,11 @@ public @interface MavenLibrary {
     String version() default "_LATEST_";
 
     /**
+     * @return True if the dependency is optional
+     */
+    boolean optional() default false;
+
+    /**
      * @return The maven dependency's
      * repository. Default isn't the
      * central because there are two
