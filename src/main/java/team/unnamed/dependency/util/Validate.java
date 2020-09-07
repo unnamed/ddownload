@@ -12,6 +12,24 @@ public final class Validate {
     }
 
     /**
+     * Checks if the provided object is null,
+     * if it's null, the method results in a
+     * {@link NullPointerException} being thrown.
+     * @param object The checked object
+     * @param <T> The type of the object
+     * @param name The name of the checked object,
+     *             used to the message in the
+     *             thrown exception.
+     * @return The object, if not null
+     */
+    public static <T> T notNull(T object, String name) {
+        if (object == null) {
+            throw new NullPointerException(name);
+        }
+        return object;
+    }
+
+    /**
      * Checks if the provided string is
      * null or empty. If the string
      * is null or empty, the method

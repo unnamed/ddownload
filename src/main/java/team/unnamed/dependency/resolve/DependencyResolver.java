@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Resolves dependencies of the provided
  * object.
- * @see AnnotationDependencyResolver
+ * @see MavenDependencyResolver
  * @see SubDependenciesResolver
  * @param <T> The type of object from which
  *           the dependencies will be resolved

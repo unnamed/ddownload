@@ -12,7 +12,7 @@ import java.util.List;
  * Resolves the dependencies of a class using
  * its type annotations.
  */
-public class AnnotationDependencyResolver implements DependencyResolver<Class<?>> {
+public class MavenDependencyResolver implements DependencyResolver<Class<?>> {
 
     @Override
     public List<Dependency> resolve(Class<?> clazz) {
@@ -25,11 +25,14 @@ public class AnnotationDependencyResolver implements DependencyResolver<Class<?>
         }
 
         for (MavenLibrary library : clazz.getAnnotationsByType(MavenLibrary.class)) {
+
             List<String> libraryRepositories = new ArrayList<>();
             String repository = library.repository();
+
             if (!repository.isEmpty() && !repository.equals("_NONE_")) {
                 libraryRepositories.add(repository);
             }
+
             libraryRepositories.addAll(repositories);
             Dependency dependency = new MavenDependency(
                     libraryRepositories.toArray(new String[0]),
