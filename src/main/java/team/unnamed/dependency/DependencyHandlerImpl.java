@@ -56,25 +56,30 @@ public class DependencyHandlerImpl implements DependencyHandler {
     public File[] download(Iterable<? extends Dependency> dependencies) {
 
         List<File> downloaded = new ArrayList<>();
+        ErrorDetails errorDetails = new ErrorDetails("Cannot download dependencies");
 
         for (Dependency dependency : dependencies) {
 
             File file = new File(folder, dependency.getArtifactName());
-            ErrorDetails errorDetails = new ErrorDetails("Cannot download dependency: " + dependency);
+            ErrorDetails dependencyErrorDetails = new ErrorDetails("Cannot download dependency: " + dependency);
 
             for (String url : dependency.getPossibleUrls()) {
-                boolean success = downloader.download(file, url, errorDetails);
+                boolean success = downloader.download(file, url, dependencyErrorDetails);
                 if (success) {
                     // don't try in another URL
                     break;
                 }
             }
 
-            if (errorDetails.errorCount() == 0) {
+            if (dependencyErrorDetails.errorCount() == 0) {
                 downloaded.add(file);
             } else if (!dependency.isOptional()) {
-                throw errorDetails.toDownloadException();
+                errorDetails.merge(dependencyErrorDetails);
             }
+        }
+
+        if (errorDetails.errorCount() > 0) {
+            throw errorDetails.toDownloadException();
         }
 
         return downloaded.toArray(EMPTY_FILE_ARRAY);
