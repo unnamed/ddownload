@@ -1,7 +1,5 @@
 package team.unnamed.dependency.annotation;
 
-import team.unnamed.dependency.exception.DependencyNotFoundException;
-
 import java.lang.annotation.*;
 
 /**

@@ -1,6 +1,6 @@
 package team.unnamed.dependency.download;
 
-import team.unnamed.dependency.exception.DependencyNotFoundException;
+import team.unnamed.dependency.exception.ErrorDetails;
 import team.unnamed.dependency.logging.LogStrategy;
 import team.unnamed.dependency.util.Validate;
 
@@ -10,23 +10,28 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class NIOConnectionImpl implements NIOConnection {
+public class MonitoreableFileDownloader implements FileDownloader {
 
     private final LogStrategy logger;
 
-    public NIOConnectionImpl(LogStrategy logger) {
+    public MonitoreableFileDownloader(LogStrategy logger) {
         // it can be a dummy log strategy, but never null
         this.logger = Validate.notNull(logger, "logger");
     }
 
     @Override
-    public File download(File file, String repoURL) {
+    public boolean download(File file, String repoURL, ErrorDetails errorDetails) {
         try {
             URL url = new URL(repoURL);
             int expectedSize = sizeOf(url);
+
             if (alreadyExist(file, expectedSize)) {
-                return file;
+                // it's already downloaded, don't
+                // try to download it from another
+                // source.
+                return true;
             }
+
             try (final InputStream inputStream = new BufferedInputStream(url.openStream())) {
                 try (MonitorByteChannel channel = MonitorByteChannel
                     .newChannel(
@@ -41,33 +46,34 @@ public class NIOConnectionImpl implements NIOConnection {
                     }
                 }
                 logger.info("Downloading " + file.getName() + "... [Success]");
+                return true;
             }
         } catch (FileNotFoundException e) {
             // Delete it to avoid corrupted files
             file.delete();
-            throw new DependencyNotFoundException(e);
+            errorDetails.add(e);
         } catch (IOException e) {
-            throw new DependencyNotFoundException(e);
+            errorDetails.add(e);
         }
-
-        return file;
+        return false;
     }
 
     private boolean alreadyExist(File file, int expectedSize) throws IOException {
-        if (file.exists()) {
-            String fileName = file.getName();
-            long fileSize = Files.size(file.toPath());
-            if (fileSize == expectedSize) {
-                logger.info(fileName + " [Already exist]");
-                return true;
-            }
-            logger.warning("Dependency file '" + fileName
-                + "' size not match with file size in Maven repository."
-                + "(File size in folder: " + fileSize
-                + ", File size in repository: " + expectedSize);
-            logger.warning("deleting file to download it again...");
-            file.delete();
+        if (!file.exists()) {
+            return false;
         }
+        String fileName = file.getName();
+        long fileSize = Files.size(file.toPath());
+        if (fileSize == expectedSize) {
+            logger.info(fileName + " [Already exist]");
+            return true;
+        }
+        logger.warning("Dependency file '" + fileName
+            + "' size not match with file size in Maven repository."
+            + "(File size in folder: " + fileSize
+            + ", File size in repository: " + expectedSize);
+        logger.warning("deleting file to download it again...");
+        file.delete();
         return false;
     }
 

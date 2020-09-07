@@ -1,8 +1,8 @@
 package team.unnamed.dependency;
 
-import team.unnamed.dependency.download.NIOConnection;
-import team.unnamed.dependency.download.NIOConnectionImpl;
-import team.unnamed.dependency.exception.DependencyNotFoundException;
+import team.unnamed.dependency.download.FileDownloader;
+import team.unnamed.dependency.download.MonitoreableFileDownloader;
+import team.unnamed.dependency.exception.ErrorDetails;
 import team.unnamed.dependency.load.JarLoader;
 import team.unnamed.dependency.logging.LogStrategy;
 import team.unnamed.dependency.util.Validate;
@@ -20,13 +20,13 @@ public class DependencyHandlerImpl implements DependencyHandler {
     private static final File[] EMPTY_FILE_ARRAY = new File[0];
 
     private final File folder;
-    private final NIOConnection downloader;
+    private final FileDownloader downloader;
     private final JarLoader loader;
     private final LogStrategy logger;
 
     public DependencyHandlerImpl(File folder, LogStrategy logger, URLClassLoader classLoader) {
         this.folder = Validate.notNull(folder, "folder");
-        this.downloader = new NIOConnectionImpl(logger);
+        this.downloader = new MonitoreableFileDownloader(logger);
         this.loader = new JarLoader(classLoader);
         this.logger = logger;
         this.createFolderIfAbsent();
@@ -39,9 +39,16 @@ public class DependencyHandlerImpl implements DependencyHandler {
 
     @Override
     public void setup(Iterable<? extends Dependency> dependencies) {
+
         File[] downloaded = download(dependencies);
+        ErrorDetails errorDetails = new ErrorDetails("Cannot load dependencies");
+
         for (File file : downloaded) {
-            toClasspath(file);
+            loader.load(file, errorDetails);
+        }
+
+        if (errorDetails.errorCount() > 0) {
+            throw errorDetails.toLoadException();
         }
     }
 
@@ -53,39 +60,24 @@ public class DependencyHandlerImpl implements DependencyHandler {
         for (Dependency dependency : dependencies) {
 
             File file = new File(folder, dependency.getArtifactName());
-
-            if (file.exists()) { // the file already exists, don't download
-                continue;
-            }
-
-            List<Throwable> errors = new ArrayList<>();
-            boolean success = false;
+            ErrorDetails errorDetails = new ErrorDetails("Cannot download dependency: " + dependency);
 
             for (String url : dependency.getPossibleUrls()) {
-
-                try {
-                    downloader.download(file, url);
-                    success = true;
+                boolean success = downloader.download(file, url, errorDetails);
+                if (success) {
+                    // don't try in another URL
                     break;
-                } catch (DependencyNotFoundException e) {
-                    errors.add(e);
                 }
             }
 
-            if (success) {
+            if (errorDetails.errorCount() == 0) {
                 downloaded.add(file);
             } else {
-                Throwable[] throwables = errors.toArray(new Throwable[0]);
-                logger.error("Dependency not found: " + dependency.toString(), throwables);
+                throw errorDetails.toDownloadException();
             }
         }
 
         return downloaded.toArray(EMPTY_FILE_ARRAY);
-    }
-
-    @Override
-    public void toClasspath(File file) {
-        loader.load(file);
     }
 
     private void createFolderIfAbsent() {

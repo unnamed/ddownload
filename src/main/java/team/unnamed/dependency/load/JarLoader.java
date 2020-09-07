@@ -1,6 +1,7 @@
 package team.unnamed.dependency.load;
 
 import team.unnamed.dependency.exception.DependencyLoadException;
+import team.unnamed.dependency.exception.ErrorDetails;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -40,12 +41,12 @@ public final class JarLoader {
      * provided classLoader
      * @param jarFile The jar file
      */
-    public void load(File jarFile) {
+    public void load(File jarFile, ErrorDetails errorDetails) {
 
         try {
             ADD_URL_METHOD.invoke(classLoader, jarFile.toURI().toURL());
         } catch (Exception e) {
-            throw new DependencyLoadException(jarFile, e);
+            errorDetails.add(e);
         }
     }
 

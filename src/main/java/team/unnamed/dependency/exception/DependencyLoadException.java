@@ -17,4 +17,8 @@ public class DependencyLoadException extends RuntimeException {
         super(cause);
     }
 
+    public DependencyLoadException(String message) {
+        super(message);
+    }
+
 }

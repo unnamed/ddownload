@@ -1,7 +1,7 @@
 package team.unnamed.dependency;
 
+import team.unnamed.dependency.exception.DependencyDownloadException;
 import team.unnamed.dependency.exception.DependencyLoadException;
-import team.unnamed.dependency.exception.DependencyNotFoundException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,9 +24,9 @@ public interface DependencyHandler {
      * @throws DependencyLoadException If an
      * error occurred while adding a dependency
      * to the classpath.
-     * @throws DependencyNotFoundException If
-     * a dependency isn't optional and it isn't
-     * found.
+     * @throws DependencyDownloadException If an
+     * error occurred while downloading the
+     * dependency file.
      * @param dependencies The dependencies
      */
     void setup(Iterable<? extends Dependency> dependencies);
@@ -37,7 +37,7 @@ public interface DependencyHandler {
      * @throws DependencyLoadException If an
      * error occurred while adding a dependency
      * to the classpath.
-     * @throws DependencyNotFoundException If
+     * @throws DependencyDownloadException If
      * a dependency isn't optional and it isn't
      * found.
      * @param dependencies The dependencies
@@ -48,7 +48,7 @@ public interface DependencyHandler {
 
     /**
      * Downloads the specified dependencies.
-     * @throws DependencyNotFoundException If
+     * @throws DependencyDownloadException If
      * a dependency isn't optional and it isn't
      * found.
      * @param dependencies The dependencies.
@@ -58,7 +58,7 @@ public interface DependencyHandler {
 
     /**
      * Downloads the specified dependencies.
-     * @throws DependencyNotFoundException If
+     * @throws DependencyDownloadException If
      * a dependency isn't optional and it isn't
      * found.
      * @param dependencies The dependencies.
@@ -67,13 +67,5 @@ public interface DependencyHandler {
     default File[] download(Dependency... dependencies) {
         return download(Arrays.asList(dependencies));
     }
-
-    /**
-     * Adds a JAR file to the classpath
-     * @param file The JAR file
-     * @throws DependencyLoadException If the
-     * file is invalid or something else
-     */
-    void toClasspath(File file);
 
 }
