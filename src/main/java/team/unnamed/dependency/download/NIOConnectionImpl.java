@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -15,9 +16,10 @@ public class NIOConnectionImpl implements NIOConnection {
     }
 
     @Override
-    public File download(File file) {
+    public File download(File file, String repoURL) {
         try {
-            URL url = file.toURI().toURL();
+            URL url = Paths.get(repoURL, file.getName())
+                .toUri().toURL();
             int expectedSize = sizeOf(url);
             if (alreadyExist(file, expectedSize)) {
                 return file;
