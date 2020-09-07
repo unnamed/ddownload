@@ -1,5 +1,7 @@
 package team.unnamed.dependency.annotation;
 
+import team.unnamed.dependency.exception.DependencyDownloadException;
+
 import java.lang.annotation.*;
 
 /**
@@ -49,7 +51,7 @@ public @interface MavenLibrary {
      *      download it and checks if the
      *      dependency is optional, if it's
      *      not optional, results in a
-     *      {@link DependencyNotFoundException}
+     *      {@link DependencyDownloadException}
      *      being thrown.
      */
     String repository() default "_NONE_";
