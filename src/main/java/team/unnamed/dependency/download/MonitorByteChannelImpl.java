@@ -22,7 +22,7 @@ public class MonitorByteChannelImpl implements MonitorByteChannel {
     private final LogStrategy logger;
 
     private final int ticks = 50;
-    private final AtomicInteger cooldownTicks = new AtomicInteger(ticks);
+    private int cooldownTicks = ticks;
 
     public MonitorByteChannelImpl(ReadableByteChannel delegate,
                                   String fileName,
@@ -39,11 +39,11 @@ public class MonitorByteChannelImpl implements MonitorByteChannel {
         int bytesDownloaded = delegate.read(byteBuffer);
         if (bytesDownloaded > 0) {
             downloadSize += bytesDownloaded;
-            if (cooldownTicks.get() > 0) {
-                cooldownTicks.getAndDecrement();
+            if (cooldownTicks > 0) {
+                cooldownTicks--;
             } else {
                 logger.info(String.format(formatInfo, fileName, getPercentage()));
-                cooldownTicks.set(ticks);
+                cooldownTicks = ticks;
             }
         }
         return bytesDownloaded;
