@@ -1,6 +1,5 @@
 package team.unnamed.dependency.logging;
 
-import team.unnamed.dependency.util.Errors;
 import team.unnamed.dependency.util.Validate;
 
 import java.util.logging.Logger;
@@ -22,21 +21,13 @@ class LoggerStrategy implements LogStrategy {
     }
 
     @Override
-    public void warning(String message, Throwable... errors) {
-        if (errors.length > 0) {
-            logger.warning(Errors.format(message, errors));
-        } else {
-            logger.warning(message);
-        }
+    public void warning(String message) {
+        logger.warning(message);
     }
 
     @Override
-    public void error(String message, Throwable... errors) {
-        if (errors.length > 0) {
-            logger.severe(Errors.format(message, errors));
-        } else {
-            logger.warning(message);
-        }
+    public void error(String message) {
+        logger.warning(message);
     }
 
 }

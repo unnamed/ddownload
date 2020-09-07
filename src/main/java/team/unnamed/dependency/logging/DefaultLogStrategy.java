@@ -1,6 +1,5 @@
 package team.unnamed.dependency.logging;
 
-import team.unnamed.dependency.util.Errors;
 import team.unnamed.dependency.util.Validate;
 
 import java.text.SimpleDateFormat;
@@ -28,25 +27,13 @@ class DefaultLogStrategy implements LogStrategy {
     }
 
     @Override
-    public void warning(String message, Throwable... errors) {
-        if (errors.length > 0) {
-            System.err.println(
-                    formatMessage("WARNING", Errors.format(message, errors))
-            );
-        } else {
-            System.out.println(formatMessage("WARNING", message));
-        }
+    public void warning(String message) {
+        System.out.println(formatMessage("WARNING", message));
     }
 
     @Override
-    public void error(String message, Throwable... errors) {
-        if (errors.length > 0) {
-            System.err.println(
-                    formatMessage("ERROR", Errors.format(message, errors))
-            );
-        } else {
-            System.err.println(formatMessage("ERROR", message));
-        }
+    public void error(String message) {
+        System.err.println(formatMessage("ERROR", message));
     }
 
     private String formatMessage(String level, String message) {

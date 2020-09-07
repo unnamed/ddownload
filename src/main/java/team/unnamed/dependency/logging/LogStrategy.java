@@ -17,16 +17,14 @@ public interface LogStrategy {
     /**
      * Sends a warning to the log receiver
      * @param message The warning message
-     * @param errors The errors (optionals)
      */
-    void warning(String message, Throwable... errors);
+    void warning(String message);
 
     /**
      * Sends an error to the log receiver
      * @param message The error message
-     * @param errors The errors (optionals)
      */
-    void error(String message, Throwable... errors);
+    void error(String message);
 
     /**
      * Returns a silent log strategy.
