@@ -21,4 +21,8 @@ public class DependencyNotFoundException extends RuntimeException {
         super("Dependency not found: " + dependency.toString(), cause);
     }
 
+    public DependencyNotFoundException(Dependency dependency, String message) {
+        super("Dependency not found: " + dependency.toString() + ". " + message);
+    }
+
 }

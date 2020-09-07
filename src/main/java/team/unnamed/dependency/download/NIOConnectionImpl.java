@@ -1,25 +1,28 @@
 package team.unnamed.dependency.download;
 
+import team.unnamed.dependency.exception.DependencyNotFoundException;
+import team.unnamed.dependency.logging.LogStrategy;
+import team.unnamed.dependency.util.Validate;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class NIOConnectionImpl implements NIOConnection {
-    private final Logger logger;
 
-    public NIOConnectionImpl(Logger logger) {
-        this.logger = logger;
+    private final LogStrategy logger;
+
+    public NIOConnectionImpl(LogStrategy logger) {
+        // it can be a dummy log strategy, but never null
+        this.logger = Validate.notNull(logger, "logger");
     }
 
     @Override
     public File download(File file, String repoURL) {
         try {
-            URL url = Paths.get(repoURL, file.getName())
-                .toUri().toURL();
+            URL url = new URL(repoURL);
             int expectedSize = sizeOf(url);
             if (alreadyExist(file, expectedSize)) {
                 return file;
@@ -37,14 +40,14 @@ public class NIOConnectionImpl implements NIOConnection {
                             .transferFrom(channel, 0, expectedSize);
                     }
                 }
-                info("Downloading " + file.getName() + "... [Success]");
+                logger.info("Downloading " + file.getName() + "... [Success]");
             }
         } catch (FileNotFoundException e) {
-            // Delete him to avoid corrupted files
+            // Delete it to avoid corrupted files
             file.delete();
-            e.printStackTrace();
+            throw new DependencyNotFoundException(e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new DependencyNotFoundException(e);
         }
 
         return file;
@@ -55,29 +58,17 @@ public class NIOConnectionImpl implements NIOConnection {
             String fileName = file.getName();
             long fileSize = Files.size(file.toPath());
             if (fileSize == expectedSize) {
-                info(fileName + " [Already exist]");
+                logger.info(fileName + " [Already exist]");
                 return true;
             }
-            warning("Dependency file '" + fileName
+            logger.warning("Dependency file '" + fileName
                 + "' size not match with file size in Maven repository."
                 + "(File size in folder: " + fileSize
                 + ", File size in repository: " + expectedSize);
-            warning("deleting file to download it again...");
+            logger.warning("deleting file to download it again...");
             file.delete();
         }
         return false;
-    }
-
-    private void info(String message) {
-        if (logger != null) {
-            logger.info(message);
-        }
-    }
-
-    private void warning(String message) {
-        if (logger != null) {
-            logger.warning(message);
-        }
     }
 
     @Override
@@ -85,4 +76,5 @@ public class NIOConnectionImpl implements NIOConnection {
         URLConnection connection = url.openConnection();
         return connection.getContentLength();
     }
+
 }

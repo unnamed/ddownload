@@ -71,6 +71,8 @@ public interface DependencyHandler {
     /**
      * Adds a JAR file to the classpath
      * @param file The JAR file
+     * @throws DependencyLoadException If the
+     * file is invalid or something else
      */
     void toClasspath(File file);
 

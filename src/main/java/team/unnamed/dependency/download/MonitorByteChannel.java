@@ -1,9 +1,10 @@
 package team.unnamed.dependency.download;
 
+import team.unnamed.dependency.logging.LogStrategy;
+
 import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.logging.Logger;
 
 /**
  * A {@link ReadableByteChannel}.
@@ -13,18 +14,16 @@ public interface MonitorByteChannel extends ReadableByteChannel {
     static MonitorByteChannel newChannel(InputStream channel,
                                          String fileName,
                                          int length,
-                                         Logger logger) {
+                                         LogStrategy logger) {
         return newChannel(Channels.newChannel(channel), fileName, length, logger);
     }
 
     static MonitorByteChannel newChannel(ReadableByteChannel channel,
                                          String fileName,
                                          int length,
-                                         Logger logger) {
+                                         LogStrategy logger) {
         return new MonitorByteChannelImpl(channel, fileName, length, logger);
     }
-
-    void setLogger(Logger logger);
 
     /**
      * Get the percentage of download to finish.

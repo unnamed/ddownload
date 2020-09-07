@@ -1,17 +1,17 @@
 package team.unnamed.dependency.download;
 
-import com.sun.istack.internal.Nullable;
+import team.unnamed.dependency.logging.LogStrategy;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 /**
  * Implementation of {@link MonitorByteChannel}.
  */
 public class MonitorByteChannelImpl implements MonitorByteChannel {
+
     private final String fileName;
     // Hardcoded message info
     private final String formatInfo = "Downloading %s... [%s]";
@@ -19,7 +19,7 @@ public class MonitorByteChannelImpl implements MonitorByteChannel {
     private final ReadableByteChannel delegate;
     private final int expectedSize;
     private int downloadSize;
-    private Logger logger;
+    private final LogStrategy logger;
 
     private final int ticks = 50;
     private final AtomicInteger cooldownTicks = new AtomicInteger(ticks);
@@ -27,11 +27,11 @@ public class MonitorByteChannelImpl implements MonitorByteChannel {
     public MonitorByteChannelImpl(ReadableByteChannel delegate,
                                   String fileName,
                                   int expectedSize,
-                                  @Nullable Logger logger) {
+                                  LogStrategy logger) {
         this.fileName = fileName;
         this.delegate = delegate;
         this.expectedSize = expectedSize;
-        setLogger(logger);
+        this.logger = logger;
     }
 
     @Override
@@ -42,8 +42,7 @@ public class MonitorByteChannelImpl implements MonitorByteChannel {
             if (cooldownTicks.get() > 0) {
                 cooldownTicks.getAndDecrement();
             } else {
-                info(String.format(formatInfo,
-                    fileName, getPercentage()));
+                logger.info(String.format(formatInfo, fileName, getPercentage()));
                 cooldownTicks.set(ticks);
             }
         }
@@ -53,19 +52,6 @@ public class MonitorByteChannelImpl implements MonitorByteChannel {
     @Override
     public boolean isOpen() {
         return delegate.isOpen();
-    }
-
-    private void info(String message) {
-        if (logger != null) {
-            logger.info(message);
-        }
-    }
-
-    @Override
-    public void setLogger(Logger logger) {
-        if (logger != null) {
-            this.logger = logger;
-        }
     }
 
     @Override
@@ -94,4 +80,5 @@ public class MonitorByteChannelImpl implements MonitorByteChannel {
     public int getBytesNeeded() {
         return expectedSize - downloadSize;
     }
+
 }
