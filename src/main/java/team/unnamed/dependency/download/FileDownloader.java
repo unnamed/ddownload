@@ -3,8 +3,6 @@ package team.unnamed.dependency.download;
 import team.unnamed.dependency.exception.ErrorDetails;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 
 public interface FileDownloader {
 
@@ -27,5 +25,4 @@ public interface FileDownloader {
      */
     boolean download(File destiny, String from, ErrorDetails errorDetails);
 
-    int sizeOf(URL url) throws IOException;
 }

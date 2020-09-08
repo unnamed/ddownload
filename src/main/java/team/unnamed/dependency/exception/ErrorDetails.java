@@ -52,7 +52,7 @@ public final class ErrorDetails {
      * @param details The details
      * @return The merged details
      */
-    public ErrorDetails merge(ErrorDetails details) {
+    public synchronized ErrorDetails merge(ErrorDetails details) {
         Validate.notNull(details, "details");
         this.messages.addAll(details.messages);
         return this;
@@ -65,7 +65,7 @@ public final class ErrorDetails {
      * @param error The error
      * @return This error details, for a fluent-api.
      */
-    public ErrorDetails add(Throwable error) {
+    public synchronized ErrorDetails add(Throwable error) {
         return add(Errors.getStackTrace(error));
     }
 
@@ -76,7 +76,7 @@ public final class ErrorDetails {
      *                not empty.
      * @return This error details, for a fluent-api
      */
-    public ErrorDetails add(String message) {
+    public synchronized ErrorDetails add(String message) {
         this.messages.add(Validate.notEmpty(message));
         return this;
     }
@@ -84,7 +84,7 @@ public final class ErrorDetails {
     /**
      * @return The error messages count.
      */
-    public int errorCount() {
+    public synchronized int errorCount() {
         return this.messages.size();
     }
 
@@ -93,7 +93,7 @@ public final class ErrorDetails {
      * into "\n" and enumerated. The heading is appended first.
      * @return The formatted error messages, everything enumerated.
      */
-    public String format() {
+    public synchronized String format() {
 
         StringJoiner joiner = new StringJoiner("\n");
         joiner.add(heading);
@@ -112,7 +112,7 @@ public final class ErrorDetails {
      * {@link DependencyLoadException}.
      * @return The new exception
      */
-    public DependencyLoadException toLoadException() {
+    public synchronized DependencyLoadException toLoadException() {
         return new DependencyLoadException(format());
     }
 
@@ -121,7 +121,7 @@ public final class ErrorDetails {
      * {@link DependencyDownloadException}.
      * @return The new exception
      */
-    public DependencyDownloadException toDownloadException() {
+    public synchronized DependencyDownloadException toDownloadException() {
         return new DependencyDownloadException(format());
     }
 

@@ -1,6 +1,7 @@
 package team.unnamed.dependency.resolve;
 
 import team.unnamed.dependency.Dependency;
+import team.unnamed.dependency.MavenDependency;
 
 import java.util.List;
 

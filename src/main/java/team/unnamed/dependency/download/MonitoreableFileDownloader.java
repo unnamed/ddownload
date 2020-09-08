@@ -5,6 +5,7 @@ import team.unnamed.dependency.logging.LogStrategy;
 import team.unnamed.dependency.util.Validate;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -23,7 +24,9 @@ public class MonitoreableFileDownloader implements FileDownloader {
     public boolean download(File file, String repoURL, ErrorDetails errorDetails) {
         try {
             URL url = new URL(repoURL);
-            int expectedSize = sizeOf(url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", "ddownloader");
+            int expectedSize = connection.getContentLength();
 
             if (alreadyExist(file, expectedSize)) {
                 // it's already downloaded, don't
@@ -32,7 +35,7 @@ public class MonitoreableFileDownloader implements FileDownloader {
                 return true;
             }
 
-            try (final InputStream inputStream = new BufferedInputStream(url.openStream())) {
+            try (final InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
                 try (MonitorByteChannel channel = MonitorByteChannel
                     .newChannel(
                         inputStream,
@@ -75,12 +78,6 @@ public class MonitoreableFileDownloader implements FileDownloader {
         logger.warning("deleting file to download it again...");
         file.delete();
         return false;
-    }
-
-    @Override
-    public int sizeOf(URL url) throws IOException {
-        URLConnection connection = url.openConnection();
-        return connection.getContentLength();
     }
 
 }

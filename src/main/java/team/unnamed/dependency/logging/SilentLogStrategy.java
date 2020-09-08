@@ -17,11 +17,11 @@ class SilentLogStrategy implements LogStrategy {
     }
 
     @Override
-    public void warning(String message, Throwable... errors) {
+    public void warning(String message) {
     }
 
     @Override
-    public void error(String message, Throwable... errors) {
+    public void error(String message) {
     }
 
 }
