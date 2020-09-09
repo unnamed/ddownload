@@ -7,7 +7,6 @@ import team.unnamed.dependency.util.Validate;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
