@@ -18,7 +18,7 @@ import java.net.URL;
  */
 public final class MavenMetadataFinder {
 
-    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newFactory();
 
     /**
      * Finds the latest version of a specified dependency using
@@ -36,7 +36,7 @@ public final class MavenMetadataFinder {
                 connection.setRequestProperty("User-Agent", "ddownloader");
 
                 try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
-                    XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(inputStream);
+                    XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
                     while (reader.hasNext()) {
                         if (reader.next() == XMLStreamConstants.START_ELEMENT) {
                             if (reader.getLocalName().equals("latest")) {
