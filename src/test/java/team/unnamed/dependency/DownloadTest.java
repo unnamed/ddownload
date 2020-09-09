@@ -3,8 +3,6 @@ package team.unnamed.dependency;
 import org.junit.jupiter.api.Test;
 import team.unnamed.dependency.annotation.MavenLibrary;
 import team.unnamed.dependency.annotation.MavenRepository;
-import team.unnamed.dependency.exception.ErrorDetails;
-import team.unnamed.dependency.version.MavenMetadataFinder;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -13,16 +11,17 @@ import java.util.concurrent.Executors;
         groupId = "me.yushust.message",
         artifactId = "core",
         version = "1.0.0",
-        repository = "https://repo.unnamed.team/repository/unnamed-releases"
+        repoId = "unnamed-releases"
 )
 @MavenLibrary(
         groupId = "org.junit.jupiter",
         artifactId = "junit-jupiter-api",
-        version = "5.7.0-RC1",
-        repository = MavenDependency.CENTRAL
+        version = "5.7.0-RC1"
 )
-@MavenRepository(MavenDependency.CENTRAL)
-@MavenRepository("https://repo.unnamed.team/repository/unnamed-releases/")
+@MavenRepository(
+        id = "unnamed-releases",
+        url = "https://repo.unnamed.team/repository/unnamed-releases/"
+)
 public class DownloadTest {
 
     @Test

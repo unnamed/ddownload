@@ -22,9 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DependencyHandlerImpl implements DependencyHandler {
 
     private static final File[] EMPTY_FILE_ARRAY = new File[0];
-    private static final DependencyResolver<Class<?>> MAVEN_DEPENDENCY_RESOLVER = new MavenDependencyResolver();
     private static final Map<Class<?>, DependencyResolver<?>> RESOLVERS = new HashMap<>();
 
+    private final DependencyResolver<Class<?>> mavenDependencyResolver;
     private final File folder;
     private final FileDownloader downloader;
     private final JarLoader loader;
@@ -46,6 +46,7 @@ public class DependencyHandlerImpl implements DependencyHandler {
         this.loader = new JarLoader(classLoader);
         this.logger = logger;
         this.executor = executor;
+        this.mavenDependencyResolver = new MavenDependencyResolver(logger);
         this.createFolderIfAbsent();
     }
 
@@ -63,7 +64,11 @@ public class DependencyHandlerImpl implements DependencyHandler {
         List<Dependency> dependencies;
 
         if (resolver == null) {
-            dependencies = MAVEN_DEPENDENCY_RESOLVER.resolve(object.getClass());
+            if (object instanceof Class) {
+                dependencies = mavenDependencyResolver.resolve((Class<?>) object);
+            } else {
+                dependencies = mavenDependencyResolver.resolve(object.getClass());
+            }
         } else {
             dependencies = ((DependencyResolver<T>) resolver).resolve(object);
         }

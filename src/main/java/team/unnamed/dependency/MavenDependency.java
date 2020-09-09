@@ -35,24 +35,6 @@ public class MavenDependency implements Dependency {
         this.version = Validate.notEmpty(version);
     }
 
-    public MavenDependency(String[] repositories, String groupId, String artifactId, String version, boolean optional) {
-        this(repositories, groupId, artifactId, version, artifactId + "-" + version + ".jar", optional);
-    }
-
-    public MavenDependency(String groupId, String artifactId, String version, boolean optional) {
-        this(new String[] {CENTRAL}, groupId, artifactId, version, optional);
-    }
-
-    public String[] getPossibleMetadataUrls() {
-        String[] possibleUrls = new String[repositories.length];
-        for (int i = 0; i < possibleUrls.length; i++) {
-            String repository = repositories[i];
-            possibleUrls[i] = Urls.endWithSlash(repository) + Urls.dotsToSlashes(groupId)
-                    + "/" + artifactId + "/maven-metadata.xml";
-        }
-        return possibleUrls;
-    }
-
     @Override
     public boolean isOptional() {
         return optional;

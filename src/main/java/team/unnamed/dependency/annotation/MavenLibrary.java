@@ -1,7 +1,5 @@
 package team.unnamed.dependency.annotation;
 
-import team.unnamed.dependency.exception.DependencyDownloadException;
-
 import java.lang.annotation.*;
 
 /**
@@ -27,6 +25,13 @@ public @interface MavenLibrary {
     String artifactId();
 
     /**
+     * The already downloaded filename.
+     * Default is artifactId-version.jar
+     * @return The filename
+     */
+    String filename() default "_DEFAULT_";
+
+    /**
      * @return The maven dependency's
      * version.
      */
@@ -39,27 +44,9 @@ public @interface MavenLibrary {
 
     /**
      * @return The maven dependency's
-     * repository. Default isn't the
-     * central because there are two
-     * repository states:
-     *
-     * - SPECIFIED: The specified
-     *      repository will be used,
-     *      if the library isn't found,
-     *      it uses the NON-SPECIFIED
-     *      strategy
-     *
-     * - NON-SPECIFIED: Uses the repositories
-     *      specified with {@link MavenRepository},
-     *      if not found, uses the central.
-     *      If not found in central, doesn't
-     *      download it and checks if the
-     *      dependency is optional, if it's
-     *      not optional, results in a
-     *      {@link DependencyDownloadException}
-     *      being thrown.
+     * repository.
      */
-    String repository() default "_NONE_";
+    String repoId() default "central";
 
     /**
      * Specifies many maven libraries.

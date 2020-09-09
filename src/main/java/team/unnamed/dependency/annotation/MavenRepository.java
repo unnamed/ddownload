@@ -12,9 +12,15 @@ import java.lang.annotation.*;
 public @interface MavenRepository {
 
     /**
+     * @return The repository id, used in
+     * {@link MavenLibrary#repoId}
+     */
+    String id();
+
+    /**
      * @return The url of the repository.
      */
-    String value();
+    String url();
 
     /**
      * Holds many maven repositories

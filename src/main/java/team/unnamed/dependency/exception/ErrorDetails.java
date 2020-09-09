@@ -125,4 +125,13 @@ public final class ErrorDetails {
         return new DependencyDownloadException(format());
     }
 
+    /**
+     * Converts the current error details to a
+     * {@link DependencyResolveException}.
+     * @return THe new exceptino
+     */
+    public synchronized DependencyResolveException toResolveException() {
+        return new DependencyResolveException(format());
+    }
+
 }

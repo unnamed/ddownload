@@ -1,7 +1,7 @@
 package team.unnamed.dependency.version;
 
-import team.unnamed.dependency.MavenDependency;
 import team.unnamed.dependency.exception.ErrorDetails;
+import team.unnamed.dependency.util.Urls;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.stream.XMLInputFactory;
@@ -22,34 +22,38 @@ public final class MavenMetadataFinder {
 
     /**
      * Finds the latest version of a specified dependency using
-     * its repositories, groupId and artifactId.
-     * @param dependency The dependency
+     * its repository, groupId and artifactId.
+     * @param repository The repository
+     * @param groupId The dependency groupId
+     * @param artifactId The dependency artifactId
      * @param errorDetails The error details
      * @return The latest version, null if not found.
      */
-    public static String getLatestVersion(MavenDependency dependency, ErrorDetails errorDetails) {
+    public static String getLatestVersion(String repository, String groupId, String artifactId,
+                                          ErrorDetails errorDetails) {
 
-        for (String metadataUrl : dependency.getPossibleMetadataUrls()) {
-            try {
-                URL url = new URL(metadataUrl);
-                HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-                connection.setRequestProperty("User-Agent", "ddownloader");
+        String metadataUrl = Urls.endWithSlash(repository) + Urls.dotsToSlashes(groupId)
+                + "/" + artifactId + "/maven-metadata.xml";
 
-                try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
-                    XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
-                    while (reader.hasNext()) {
-                        if (reader.next() == XMLStreamConstants.START_ELEMENT) {
-                            if (reader.getLocalName().equals("latest")) {
-                                return reader.getElementText();
-                            }
+        try {
+            URL url = new URL(metadataUrl);
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setRequestProperty("User-Agent", "ddownloader");
+
+            try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
+                XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
+                while (reader.hasNext()) {
+                    if (reader.next() == XMLStreamConstants.START_ELEMENT) {
+                        if (reader.getLocalName().equals("latest")) {
+                            return reader.getElementText();
                         }
                     }
-                } catch (XMLStreamException e) {
-                    errorDetails.add(e);
                 }
-            } catch (IOException e) {
+            } catch (XMLStreamException e) {
                 errorDetails.add(e);
             }
+        } catch (IOException e) {
+            errorDetails.add(e);
         }
 
         return null;
