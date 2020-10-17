@@ -13,8 +13,8 @@ import team.unnamed.dependency.util.Validate;
 import java.io.File;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Default implementation of {@link DependencyHandler}
@@ -107,7 +107,7 @@ public class DependencyHandlerImpl implements DependencyHandler {
     private File[] download(Collection<? extends Dependency> dependencies, ErrorDetails errorDetails) {
 
         List<File> downloaded = new ArrayList<>();
-        AtomicInteger countdown = new AtomicInteger(dependencies.size());
+        CountDownLatch countdown = new CountDownLatch(dependencies.size());
 
         for (Dependency dependency : dependencies) {
 
@@ -133,12 +133,14 @@ public class DependencyHandlerImpl implements DependencyHandler {
                     }
                 }
 
-                countdown.getAndDecrement();
+                countdown.countDown();
             });
         }
 
-        while (countdown.get() > 0) {
-            // wait
+        try {
+            countdown.await();
+        } catch (InterruptedException e) {
+            errorDetails.add(e);
         }
 
         return downloaded.toArray(EMPTY_FILE_ARRAY);
