@@ -29,6 +29,7 @@ public interface DependencyHandler {
      * {@link MavenDependencyResolver} for
      * resolve dependencies with annotations.
      * @param object The object
+     * @param <T> A generic indicating the type of the object
      */
     <T> void setup(T object);
 

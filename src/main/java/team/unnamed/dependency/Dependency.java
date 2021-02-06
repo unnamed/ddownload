@@ -33,7 +33,6 @@ public interface Dependency {
 
     /**
      * @return Dependency information
-     * @implNote Include details
      */
     String toString();
 
