@@ -13,10 +13,12 @@ import java.nio.file.Files;
 public class MonitoreableFileDownloader implements FileDownloader {
 
     private final LogStrategy logger;
+    private final boolean deleteOnNonEqual;
 
-    public MonitoreableFileDownloader(LogStrategy logger) {
+    public MonitoreableFileDownloader(LogStrategy logger, boolean deleteOnNonEqual) {
         // it can be a dummy log strategy, but never null
         this.logger = Validate.notNull(logger, "logger");
+        this.deleteOnNonEqual = deleteOnNonEqual;
     }
 
     @Override
@@ -36,15 +38,15 @@ public class MonitoreableFileDownloader implements FileDownloader {
 
             try (final InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
                 try (MonitorByteChannel channel = MonitorByteChannel
-                    .newChannel(
-                        inputStream,
-                        file.getName(),
-                        expectedSize,
-                        logger)) {
+                        .newChannel(
+                                inputStream,
+                                file.getName(),
+                                expectedSize,
+                                logger)) {
                     try (FileOutputStream stream = new FileOutputStream(file)) {
                         stream
-                            .getChannel()
-                            .transferFrom(channel, 0, expectedSize);
+                                .getChannel()
+                                .transferFrom(channel, 0, expectedSize);
                     }
                 }
                 logger.info("Downloading " + file.getName() + "... [Success]");
@@ -71,11 +73,16 @@ public class MonitoreableFileDownloader implements FileDownloader {
             return true;
         }
         logger.warning("Dependency file '" + fileName
-            + "' size not match with file size in Maven repository."
-            + "(File size in folder: " + fileSize
-            + ", File size in repository: " + expectedSize);
-        logger.warning("deleting file to download it again...");
-        file.delete();
+                + "' size not match with file size in Maven repository."
+                + "(File size in folder: " + fileSize
+                + ", File size in repository: " + expectedSize);
+        if(deleteOnNonEqual){
+            logger.warning("deleting file to download it again...");
+            file.delete();
+        } else {
+            return true;
+        }
+
         return false;
     }
 

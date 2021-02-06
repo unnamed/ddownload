@@ -1,5 +1,6 @@
 package team.unnamed.dependency;
 
+import team.unnamed.dependency.load.JarLoader;
 import team.unnamed.dependency.logging.LogStrategy;
 import team.unnamed.dependency.util.Validate;
 
@@ -16,6 +17,9 @@ public final class DependencyHandlerBuilder {
     private LogStrategy logStrategy = LogStrategy.getDefault();
     private File folder; // required
     private URLClassLoader classLoader;
+    private JarLoader loader;
+
+    private boolean deleteOnNonEqual = true;
 
     DependencyHandlerBuilder() {
     }
@@ -43,12 +47,28 @@ public final class DependencyHandlerBuilder {
         return this;
     }
 
+
+    public DependencyHandlerBuilder setLoader(JarLoader loader) {
+        this.loader = Validate.notNull(loader, "loader");
+        return this;
+    }
+
+    public DependencyHandlerBuilder setDeleteOnNonEqual(boolean deleteOnNonEqual) {
+        this.deleteOnNonEqual = deleteOnNonEqual;
+        return this;
+    }
+
     public DependencyHandler build() {
-        if (classLoader == null) {
-            classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        if (loader == null) {
+            if (classLoader == null) {
+                classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+            }
+
+            this.loader = new JarLoader(classLoader);
         }
+
         Validate.notNull(folder, "Folder is required!");
-        return new DependencyHandlerImpl(folder, logStrategy, classLoader, executor);
+        return new DependencyHandlerImpl(folder, logStrategy, loader, executor, deleteOnNonEqual);
     }
 
 }

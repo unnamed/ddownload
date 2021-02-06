@@ -7,6 +7,7 @@
     <groupId>team.unnamed.dependency</groupId>
     <artifactId>downloader</artifactId>
     <version>0.1.0</version>
+    <packaging>jar</packaging>
 
     <build>
         <plugins>
@@ -29,5 +30,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+	
+		
+	<distributionManagement>
+        <snapshotRepository>
+            <id>unnamed-snapshots</id>
+            <url>https://repo.unnamed.team/repository/unnamed-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>unnamed-releases</id>
+            <url>https://repo.unnamed.team/repository/unnamed-releases/</url>
+        </repository>
+    </distributionManagement>
 
 </project>

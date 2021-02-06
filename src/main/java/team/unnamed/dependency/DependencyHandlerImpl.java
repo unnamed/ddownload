@@ -11,7 +11,6 @@ import team.unnamed.dependency.resolve.SubDependenciesResolver;
 import team.unnamed.dependency.util.Validate;
 
 import java.io.File;
-import java.net.URLClassLoader;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
@@ -40,10 +39,10 @@ public class DependencyHandlerImpl implements DependencyHandler {
     }
 
     // use DependencyHandler.builder() to create a builder
-    DependencyHandlerImpl(File folder, LogStrategy logger, URLClassLoader classLoader, Executor executor) {
+    DependencyHandlerImpl(File folder, LogStrategy logger, JarLoader loader, Executor executor, boolean deleteOnNonEqual) {
         this.folder = Validate.notNull(folder, "folder");
-        this.downloader = new MonitoreableFileDownloader(logger);
-        this.loader = new JarLoader(classLoader);
+        this.downloader = new MonitoreableFileDownloader(logger, deleteOnNonEqual);
+        this.loader = loader;
         this.logger = logger;
         this.executor = executor;
         this.mavenDependencyResolver = new MavenDependencyResolver(logger);
@@ -120,12 +119,14 @@ public class DependencyHandlerImpl implements DependencyHandler {
                 for (String url : dependency.getPossibleUrls()) {
                     success = downloader.download(file, url, dependencyErrorDetails);
                     if (success) {
+                        // clear the errors, we already succeeded
+                        dependencyErrorDetails = new ErrorDetails("Cannot download dependency: " + dependency);
                         // don't try in another URL
                         break;
                     }
                 }
 
-                if (!success) {
+                if (success) {
                     if (dependencyErrorDetails.errorCount() == 0) {
                         downloaded.add(file);
                     } else if (!dependency.isOptional()) {
