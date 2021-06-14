@@ -1,6 +1,7 @@
 package team.unnamed.dependency;
 
 import team.unnamed.dependency.load.JarLoader;
+import team.unnamed.dependency.load.JarLoaderJdk8;
 import team.unnamed.dependency.logging.LogStrategy;
 import team.unnamed.dependency.util.Validate;
 
@@ -64,7 +65,7 @@ public final class DependencyHandlerBuilder {
                 classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
             }
 
-            this.loader = new JarLoader(classLoader);
+            this.loader = new JarLoaderJdk8(classLoader);
         }
 
         Validate.notNull(folder, "Folder is required!");
