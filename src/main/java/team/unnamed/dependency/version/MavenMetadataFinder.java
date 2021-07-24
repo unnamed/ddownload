@@ -23,9 +23,10 @@ public final class MavenMetadataFinder {
     /**
      * Finds the latest version of a specified dependency using
      * its repository, groupId and artifactId.
-     * @param repository The repository
-     * @param groupId The dependency groupId
-     * @param artifactId The dependency artifactId
+     *
+     * @param repository   The repository
+     * @param groupId      The dependency groupId
+     * @param artifactId   The dependency artifactId
      * @param errorDetails The error details
      * @return The latest version, null if not found.
      */
@@ -35,15 +36,20 @@ public final class MavenMetadataFinder {
         String metadataUrl = Urls.endWithSlash(repository) + Urls.dotsToSlashes(groupId)
                 + "/" + artifactId + "/maven-metadata.xml";
 
+        String releaseVersion = null;
         try {
             URL url = new URL(metadataUrl);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestProperty("User-Agent", "ddownloader");
 
+
             try (BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
                 XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
                 while (reader.hasNext()) {
                     if (reader.next() == XMLStreamConstants.START_ELEMENT) {
+                        if (reader.getLocalName().equals("release")) {
+                            releaseVersion = reader.getElementText();
+                        }
                         if (reader.getLocalName().equals("latest")) {
                             return reader.getElementText();
                         }
@@ -55,8 +61,7 @@ public final class MavenMetadataFinder {
         } catch (IOException e) {
             errorDetails.add(e);
         }
-
-        return null;
+        return releaseVersion;
     }
 
 }
