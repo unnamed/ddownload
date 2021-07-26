@@ -22,6 +22,12 @@ public interface Dependency {
     String[] getPossibleUrls();
 
     /**
+     * @return The urls where the
+     * dependency are origin
+     */
+    String[] getPossibleOriginUrls();
+
+    /**
      * @return The already downloaded
      * file name. The dependency handler
      * checks if a file with this name

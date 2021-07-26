@@ -54,6 +54,19 @@ public class MavenDependency implements Dependency {
     }
 
     @Override
+    public String[] getPossibleOriginUrls() {
+        String[] possibleUrls = new String[repositories.length];
+        for (int i = 0; i < possibleUrls.length; i++) {
+            String repository = repositories[i];
+            String url = Urls.endWithSlash(repository) + Urls.dotsToSlashes(groupId)
+                    + "/" + artifactId + "/" + version + "/" + artifactId
+                    + "-" + version + ".pom";
+            possibleUrls[i] = url;
+        }
+        return possibleUrls;
+    }
+
+    @Override
     public String getArtifactName() {
         return artifactName;
     }
