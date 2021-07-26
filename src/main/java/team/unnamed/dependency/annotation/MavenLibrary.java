@@ -1,6 +1,7 @@
 package team.unnamed.dependency.annotation;
 
 import java.lang.annotation.*;
+import java.util.Map;
 
 /**
  * Specifies that the annotated class
@@ -27,6 +28,7 @@ public @interface MavenLibrary {
     /**
      * The already downloaded filename.
      * Default is artifactId-version.jar
+     *
      * @return The filename
      */
     String filename() default "_DEFAULT_";

@@ -22,7 +22,10 @@ public class SubDependencyResolverTest {
         DependencyResolver<Class<?>> resolver = new MavenDependencyResolver(LogStrategy.getSilent());
         List<Dependency> dependencies = resolver.resolve(SubDependencyResolverTest.class);
         for (Dependency dependency : dependencies ) {
-            List<Dependency> subDependency = new SubDependenciesResolver().resolve(dependency);
+            List<Dependency> subDependencies = new SubDependenciesResolver().resolve(dependency);
+            for (Dependency subDependency : subDependencies) {
+                System.out.println(subDependency);
+            }
         }
     }
 

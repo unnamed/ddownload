@@ -19,6 +19,14 @@
                     <target>8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
         </plugins>
 
     </build>
@@ -29,13 +37,6 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.7.0-RC1</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>3.3.9</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 	
